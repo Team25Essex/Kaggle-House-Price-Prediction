@@ -1,0 +1,8 @@
+I change our encoder to CatEncoder, and I add a new model called LightBoost. I also add two new functions, Function features for regularization 
+to see the importance of each column and only remain the useful columns, Function check helps us to see the score immediately so no need to sumbit
+our file serveral times.
+If you want to move the code to colab, there might be import issue due to the lack of file "category_encoders", the link is provided here:
+https://github.com/scikit-learn-contrib/categorical-encoding
+Wish you can improve our rank
+Best wish
+Tim.

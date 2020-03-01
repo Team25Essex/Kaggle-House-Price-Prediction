@@ -267,7 +267,7 @@ standard_valid_x=pd.DataFrame(data=scalar.fit(LIGHT_VALID_X).transform(LIGHT_VAL
 standard_test_x = pd.DataFrame(data=scalar.fit(UNION_TEST_X).transform(UNION_TEST_X), columns=UNION_TEST_X.columns[:])
 
 
-PCA
+#PCA
 pca = PCA(n_components=0.965)
 Remained_train_X = pca.fit_transform(standard_x)
 Remained_train_X = pd.DataFrame(np.reshape(Remained_train_X,(660,int(Remained_train_X.size/660))),columns=LIGHT_TRAIN_X.columns[:int(Remained_train_X.size/660)])
@@ -304,7 +304,7 @@ List = [prepare,my_model,bestm1,bestm2]
 #Using Stack to combine each portion of estimator's predition together 
 List=[bestprediction4,bestprediction2,bestprediction1]  # List of the model to pass to the function
 Portion= [0.7,0.15,0.15]   #List of proportion for the List of the model, must add up to 1. for this example, bestprediction4 will have 0.7 size.
-c= ensemble(List,2,Portion)
+c= ensemble(List,2,Portion) #The index 1 will return the average point of each prediction, index 2 will return one prediction that mix different preditions with their associated proportion together.
 bestprediction=np.expm1(c)
 
 predictionframe = pd.DataFrame({'Id':test2.Id,

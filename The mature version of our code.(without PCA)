@@ -271,7 +271,7 @@ bestprediction2=bestm2.predict(remained_test_X)
 List = [prepare,my_model,bestm1,bestm2]
 #Check(remained_train_X,train_train_y_1,List)
 
-bestprediction=np.exp(bestprediction2)
+bestprediction=np.exp((bestprediction1+bestprediction3+bestprediction4+bestprediction2)/4)
 
 predictionframe = pd.DataFrame({'Id':test2.Id,
                        'SalePrice': bestprediction})

@@ -1,3 +1,6 @@
+### There are two line for two columns for the object_columns which is the good columns to keep, the first line is to use Feature function to return good columns and the second line is to restore the function's return so no need to run function a lot of times and wait for too long!
+
+
 
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -227,7 +230,7 @@ for each in [train_train, train_valid]:
 
 
 #Regularization and remain the good columns:
-#Object_Columns=Features(LIGHT_TRAIN_X,train_train_y_1)
+Object_Columns=Features(LIGHT_TRAIN_X,train_train_y_1)
 #Object_Columns=['MSZoning', 'Alley', 'LotShape', 'LandContour', 'LotConfig',
 #       'LandSlope', 'Neighborhood', 'Condition1', 'Condition2', 'BldgType',
 #       'HouseStyle', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd',

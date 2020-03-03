@@ -289,7 +289,7 @@ bestm2.fit(Remained_train_X,train_train_y)
 bestprediction2=bestm2.predict(Remained_test_X)
 
 List = [prepare,my_model,bestm1,bestm2]
-Check(expm1(Remained_train_X),train_train_y_1,List)
+Check(np.expm1(Remained_train_X),train_train_y_1,List)
 
 
 #Using Stack to combine each portion of estimator's predition together 

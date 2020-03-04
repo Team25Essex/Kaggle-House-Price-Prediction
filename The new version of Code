@@ -54,8 +54,8 @@ def ensemble(L_bestprediction, index,L_portion = []) :
   if index == 1:
         suma = 0
         for a in L_bestprediction:
-            a=+ suma
-        average = sum/len(L_bestprediction)
+            suma +=a
+        average = suma/len(L_bestprediction)
         return average
   elif index == 2:
         c=0

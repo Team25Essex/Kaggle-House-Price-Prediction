@@ -2,6 +2,7 @@
 
 
 
+
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
@@ -13,6 +14,7 @@ from sklearn.model_selection import cross_val_score
 from xgboost import XGBRegressor
 import lightgbm as lgb
 from lightgbm import LGBMRegressor 
+import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectFromModel
 from sklearn.multiclass import OneVsRestClassifier
@@ -24,7 +26,7 @@ from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 def Features(x, y):
         
-        logistic = LogisticRegression(C=0.35, penalty="l1",solver='liblinear', random_state=100).fit(x, y)
+        logistic = LogisticRegression(C=0.1, penalty="l1",solver='liblinear', random_state=5).fit(x, y)
         model = SelectFromModel(logistic, prefit=True)
         x_new = model.transform(x)
     
@@ -230,7 +232,7 @@ for each in [train_train, train_valid]:
 
 
 #Regularization and remain the good columns:
-Object_Columns=Features(LIGHT_TRAIN_X,train_train_y_1)
+#Object_Columns=Features(LIGHT_TRAIN_X,train_train_y_1)
 #Object_Columns=['MSZoning', 'Alley', 'LotShape', 'LandContour', 'LotConfig',
 #       'LandSlope', 'Neighborhood', 'Condition1', 'Condition2', 'BldgType',
 #       'HouseStyle', 'RoofStyle', 'RoofMatl', 'Exterior1st', 'Exterior2nd',
@@ -248,9 +250,9 @@ Object_Columns=Features(LIGHT_TRAIN_X,train_train_y_1)
 #       '-_oFunctional_TotalHouse', '-_oFunctional_OverallQual',
 #       '-_LotArea_OverallQual', '-_TotalHouse_LotArea',
 #       '-_oCondition1_TotalHouse', '-_oCondition1_OverallQual', 'TotalPlace']
-LIGHT_TRAIN_X = LIGHT_TRAIN_X[Object_Columns]
-LIGHT_VALID_X = LIGHT_VALID_X[Object_Columns]
-UNION_TEST_X = UNION_TEST_X[Object_Columns] 
+#LIGHT_TRAIN_X = LIGHT_TRAIN_X[Object_Columns]
+#LIGHT_VALID_X = LIGHT_VALID_X[Object_Columns]
+#UNION_TEST_X = UNION_TEST_X[Object_Columns] 
 
 #preprocessing the data to have all datas in the same standard, also known as normalization
 scalar = StandardScaler()
@@ -259,7 +261,7 @@ standard_valid_x=pd.DataFrame(data=scalar.fit(LIGHT_VALID_X).transform(LIGHT_VAL
 standard_test_x = pd.DataFrame(data=scalar.fit(UNION_TEST_X).transform(UNION_TEST_X), columns=UNION_TEST_X.columns[:])
 
 #PCA
-pca = PCA(n_components= 0.95)
+pca = PCA(n_components= 0.97)
 Remained_train_X = pca.fit_transform(standard_x)
 Remained_train_X = pd.DataFrame(np.reshape(Remained_train_X,(660,int(Remained_train_X.size/660))),columns=LIGHT_TRAIN_X.columns[:int(Remained_train_X.size/660)])
 Remained_valid_X = pca.transform(standard_valid_x)
@@ -268,14 +270,15 @@ Remained_test_X = pca.transform(standard_test_x)
 Remained_test_X = pd.DataFrame(data=np.reshape(Remained_test_X,(1459,int(Remained_test_X.size/1459))),columns=LIGHT_TRAIN_X.columns[:int(Remained_test_X.size/1459)])
 
 #Light
-
-prepare = LGBMRegressor(metric='mae',num_leaves= 60,objective='regression', learning_rate=0.001, n_estimators=20000)
-prepare.fit(Remained_train_X,train_train_y,eval_set=[(Remained_valid_X,train_valid_y)], early_stopping_rounds=1000)
+prepare_new = LGBMRegressor(metric='mae',num_leaves= 60,objective='regression', learning_rate=0.01, n_estimators=1000)
+prepare = LGBMRegressor(metric='mae',num_leaves= 60,objective='regression', learning_rate=0.01, n_estimators=20000)
+prepare.fit(Remained_train_X,train_train_y,eval_set=[(Remained_valid_X,train_valid_y)], early_stopping_rounds=200)
 bestprediction4 = prepare.predict(Remained_test_X)
 
 #XGBOOST
-my_model = XGBRegressor(n_estimators=20000,objective ='reg:squarederror', learning_rate=0.001)
-my_model.fit(Remained_train_X, train_train_y,early_stopping_rounds=1000,eval_set=[(Remained_valid_X, train_valid_y)], verbose=False)
+my_model_new = XGBRegressor(n_estimators=1000,objective ='reg:squarederror', learning_rate=0.01)
+my_model = XGBRegressor(n_estimators=20000,objective ='reg:squarederror', learning_rate=0.01)
+my_model.fit(Remained_train_X, train_train_y,early_stopping_rounds=200,eval_set=[(Remained_valid_X, train_valid_y)], verbose=False)
 bestprediction3=my_model.predict(Remained_test_X)
 #Using Linear Regression model:
 bestm1=LinearRegression()
@@ -288,14 +291,14 @@ bestm2 = RandomForestRegressor(random_state=5)
 bestm2.fit(Remained_train_X,train_train_y)
 bestprediction2=bestm2.predict(Remained_test_X)
 
-List = [prepare,my_model,bestm1,bestm2]
+List = [prepare_new,my_model_new,bestm1,bestm2]
 Check(np.expm1(Remained_train_X),train_train_y_1,List)
 
 
 #Using Stack to combine each portion of estimator's predition together 
-List=[bestprediction4]  # List of the model to pass to the function
-Portion= [1]   #List of proportion for the List of the model, must add up to 1. for this example, bestprediction4 will have 0.7 size.
-c= ensemble(List,2,Portion)
+List1=[bestprediction4,bestprediction3,bestprediction2,bestprediction1]  # List of the model to pass to the function
+Portion= [0.25,0.25,0.25,0.25]   #List of proportion for the xList of the model, must add up to 1. for this example, bestprediction4 will have 0.7 size.
+c= ensemble(List1,2,Portion)
 bestprediction=np.expm1(c)
 
 predictionframe = pd.DataFrame({'Id':test2.Id,

@@ -198,7 +198,7 @@ UNION_TEST_X["TotalPlace"] = UNION_TEST_X["TotalBsmtSF"] + UNION_TEST_X["1stFlrS
 #encode categorical columns with CatEncoder and log the columns that has positive skewness:
 Numeric= UNION_TEST_X.select_dtypes(exclude=['object'])
 categorical = UNION_TEST_X.select_dtypes(include=['object']).columns
-CE = ce.CatBoostEncoder(cols=categorical)
+CE = ce.CatBoostEncoder()
 CE.fit(LIGHT_TRAIN_X[categorical], LIGHT_TRAIN_X['SalePrice'])
 LIGHT_TRAIN_X[categorical] = CE.transform(LIGHT_TRAIN_X[categorical])
 UNION_TEST_X[categorical] = CE.transform(UNION_TEST_X[categorical])
